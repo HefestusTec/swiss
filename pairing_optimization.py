@@ -1,9 +1,11 @@
-import networkx as nx
-import math
 import itertools
-from pairings import Pairing, Pairings
-from match_log import MatchLog
-from shared_functions import bye_dummy_player_name
+import math
+
+import networkx as nx
+
+from swiss.pairings import Pairing, Pairings
+from swiss.shared_functions import bye_dummy_player_name
+
 
 def optimal_pairing(match_log, cost_map):
     players = match_log.players()
@@ -23,7 +25,11 @@ def optimal_pairing(match_log, cost_map):
         done_costs = set()
         for i, pa in enumerate(players):
             for j, pb in enumerate(players):
-                if (j < i and match_log.is_player_active(pa) and match_log.is_player_active(pb)):
+                if (
+                    j < i
+                    and match_log.is_player_active(pa)
+                    and match_log.is_player_active(pb)
+                ):
                     cost = cost_map[pa][pb]
                     if cost in done_costs:
                         raise Exception("cost_map does not return unique values")
@@ -50,10 +56,10 @@ def optimal_pairing(match_log, cost_map):
         for e in pairs:
             cost = cost_map[e[0]][e[1]]
             if e[0] == bye_dummy_player_name():
-                assert(pairings.bye_player is None)
+                assert pairings.bye_player is None
                 pairings.bye_player = e[1]
             elif e[1] == bye_dummy_player_name():
-                assert(pairings.bye_player is None)
+                assert pairings.bye_player is None
                 pairings.bye_player = e[0]
             else:
                 num_0 = players.index(e[0])
@@ -74,18 +80,20 @@ def number_of_optimal_pairings(match_log, cost_map):
     if len(players) % 2 != 0:
         players.append(bye_dummy_player_name())
     # Brute force
-    possible_pairings_in_round = round(len(players) / 2) # Always even
+    possible_pairings_in_round = round(len(players) / 2)  # Always even
     perms = itertools.permutations(players)
     pairs_costs = []
     for perm in perms:
         cost = 0
         for i in range(possible_pairings_in_round):
-            pa = perm[i*2]
-            pb = perm[i*2 + 1]
+            pa = perm[i * 2]
+            pb = perm[i * 2 + 1]
             cost += cost_map[pa][pb]
         pairs_costs.append(cost)
     min_cost = min(pairs_costs)
     s = sum([1 if c == min_cost else 0 for c in pairs_costs])
-    rslt = s / (math.factorial(possible_pairings_in_round) * 2**possible_pairings_in_round)
-    assert(round(rslt) == rslt)
+    rslt = s / (
+        math.factorial(possible_pairings_in_round) * 2**possible_pairings_in_round
+    )
+    assert round(rslt) == rslt
     return round(rslt)

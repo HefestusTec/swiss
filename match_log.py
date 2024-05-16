@@ -1,7 +1,6 @@
-from match_result import MatchResult
-from shared_functions import bye_dummy_player_name
-import networkx as nx
-import random
+from swiss.match_result import MatchResult
+from swiss.shared_functions import bye_dummy_player_name
+
 
 class MatchLog:
     def __init__(self):
@@ -11,30 +10,24 @@ class MatchLog:
         # Ensures we don't error if the user tries to look this up
         self.set_player_active(bye_dummy_player_name(), True)
 
-
     def add_player(self, player_name):
         if player_name not in self._explicit_players:
             self._explicit_players.append(player_name)
             self._player_active_map[player_name] = True
-
 
     def add_result(self, player_a, player_b, wins_a, wins_b):
         self.add_player(player_a)
         self.add_player(player_b)
         self._entries.append(MatchResult(player_a, player_b, wins_a, wins_b))
 
-
     def set_player_active(self, player, new_state):
         self._player_active_map[player] = new_state
-
 
     def is_player_active(self, player):
         return self._player_active_map[player]
 
-
-    def add_bye(self, player):
-        self._entries.append(MatchResult(player, None, 0, 0))
-
+    def add_bye(self, player, score=0):
+        self._entries.append(MatchResult(player, None, score, 0))
 
     def players(self):
         # Add dummy if we're an odd number of players
@@ -43,10 +36,8 @@ class MatchLog:
         else:
             return self._explicit_players + [bye_dummy_player_name()]
 
-
     def active_players(self):
         return [p for p in self.players() if self.is_player_active(p)]
-
 
     def times_matched(self, player_a, player_b):
         rslt = 0
@@ -55,14 +46,12 @@ class MatchLog:
                 rslt += 1
         return rslt
 
-
     def times_got_bye(self, player):
         rslt = 0
         for entry in self._entries:
             if entry.is_bye() and entry.winner() == player:
                 rslt += 1
         return rslt
-
 
     def times_match_win(self, player):
         rslt = 0
@@ -72,16 +61,14 @@ class MatchLog:
                 rslt += 1
         return rslt
 
-
     def player_score(self, player):
         rslt = 0
         for entry in self._entries:
             if entry.player_a() == player:
-                rslt += entry.player_a_wins()
+                rslt += int(entry.player_a_wins())
             if entry.player_b() == player:
-                rslt += entry.player_b_wins()
+                rslt += int(entry.player_b_wins())
         return rslt
-
 
     def min_active_bye_count(self):
         byes = []
@@ -92,7 +79,6 @@ class MatchLog:
             return 0
         else:
             return min(byes)
-
 
     def ranking(self):
         return sorted(self.players(), key=lambda e: self.player_score(e), reverse=True)

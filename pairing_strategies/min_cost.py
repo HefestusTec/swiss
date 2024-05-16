@@ -1,21 +1,22 @@
-from pairing_optimization import optimal_pairing, number_of_optimal_pairings
-from pairing_cost_map import pairing_cost_map
-from shared_functions import bye_dummy_player_name
+from swiss.pairing_cost_map import pairing_cost_map
+from swiss.pairing_optimization import number_of_optimal_pairings, optimal_pairing
+from swiss.shared_functions import bye_dummy_player_name
+
 
 def _pairing_cost_functions(match_log):
 
     def _minimize_times_bye(player_a, player_b):
-        if (player_a == bye_dummy_player_name()):
+        if player_a == bye_dummy_player_name():
             return match_log.times_got_bye(player_b)
-        elif (player_b == bye_dummy_player_name()):
+        elif player_b == bye_dummy_player_name():
             return match_log.times_got_bye(player_a)
         else:
             return 0
 
     def _minimize_bye_player_wins(player_a, player_b):
-        if (player_a == bye_dummy_player_name()):
+        if player_a == bye_dummy_player_name():
             return match_log.times_match_win(player_b)
-        elif (player_b == bye_dummy_player_name()):
+        elif player_b == bye_dummy_player_name():
             return match_log.times_match_win(player_a)
         else:
             return 0
@@ -24,7 +25,9 @@ def _pairing_cost_functions(match_log):
         return match_log.times_matched(player_a, player_b)
 
     def _minimize_win_diff(player_a, player_b):
-        return abs(match_log.times_match_win(player_a) - match_log.times_match_win(player_b))
+        return abs(
+            match_log.times_match_win(player_a) - match_log.times_match_win(player_b)
+        )
 
     def _minimize_player_number_diff(player_a, player_b):
         num_a = match_log.players().index(player_a)
@@ -36,14 +39,17 @@ def _pairing_cost_functions(match_log):
         player_count = len(players)
         num_a = players.index(player_a)
         num_b = players.index(player_b)
-        return 2*player_count - (num_a + num_b)
+        return 2 * player_count - (num_a + num_b)
 
-    return [_minimize_times_bye, \
-            _minimize_bye_player_wins, \
-            _minimize_times_matched, \
-            _minimize_win_diff, \
-            _minimize_player_number_diff, \
-            _maximize_player_number_sum]
+    return [
+        _minimize_times_bye,
+        _minimize_bye_player_wins,
+        _minimize_times_matched,
+        _minimize_win_diff,
+        _minimize_player_number_diff,
+        _maximize_player_number_sum,
+    ]
+
 
 def pairings(match_log):
     """
@@ -58,12 +64,12 @@ def pairings(match_log):
     """
     players = match_log.players()
     cost_functions = _pairing_cost_functions(match_log)
-    return optimal_pairing(match_log, \
-                           pairing_cost_map(players, cost_functions))
+    return optimal_pairing(match_log, pairing_cost_map(players, cost_functions))
 
 
 def number_of_possible_pairings(match_log):
     players = match_log.players()
     cost_functions = _pairing_cost_functions(match_log)
-    return number_of_optimal_pairings(match_log, \
-                                      pairing_cost_map(players, cost_functions))
+    return number_of_optimal_pairings(
+        match_log, pairing_cost_map(players, cost_functions)
+    )

@@ -1,4 +1,6 @@
 # Swiss
+Forked from [Swiss](https://github.com/HannesHaglund/Swiss). Modified to work as a submodule for [Torneio Suiço](https://github.com/HefestusTec/torneio-suico)
+
 A library for managing Swiss-style tournaments in Python 3.
 
 Use it as a backend for your application, or just call Python code interactively to manage your own local tournaments.
